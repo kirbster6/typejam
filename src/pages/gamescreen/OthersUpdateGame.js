@@ -1,4 +1,5 @@
-import { useOthers } from "../../liveblocks.config";
+import { useOthers, useSelf} from "../../liveblocks.config";
+import TypeBox from "./typebox/TypeBox";
 
 function OthersUpdateGame() {
     // List of other users
@@ -6,23 +7,24 @@ function OthersUpdateGame() {
   
     // If a cursor is on screen (not null), render
     return (
-      <>
-        {others.map(({ connectionId, presence }) =>
-          presence.cursor ? (
-            <Cursor
-              key={connectionId}
-              x={presence.cursor.x}
-              y={presence.cursor.y}
-            />
-          ) : null
-        )}
-      </>
+      <div>
+        <h1>BRUHH</h1>
+        {others.map(({ presence }) =>{
+          return (
+            <div>
+              <p>Other User: {presence.nickname}</p>
+              <p>Other User Words Left: {presence.wordsLeft}</p>
+            </div>
+          ) 
+        })}
+
+      </div>
     );
   }
   
   // Basic cursor component
   function Cursor({ x, y }) {
-    console.log("wait")
+    // console.log("wait")
     return (
         <div>
             <p>Maybe Working/</p>

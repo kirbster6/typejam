@@ -10,5 +10,6 @@ export const {
         RoomProvider,
         useOthers,
         useUpdateMyPresence,
+        useSelf,
     }, 
 } = createRoomContext(client);

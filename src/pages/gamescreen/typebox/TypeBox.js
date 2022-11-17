@@ -1,30 +1,204 @@
-import React from 'react';
+import React, {useState, useMemo, useRef} from 'react';
 import './TypeBox.scss';
-import {useState} from 'react';
+import {useSelf, useOthers, useUpdateMyPresence} from '../../../liveblocks.config.js';
 
-const TypeBox = () =>{
+import useTypingGame , { CharStateType } from 'react-typing-game-hook';
 
-    const TIME_SECONDS = 60;
+const randomWords = require('random-words');
 
-    const [words, setWords] = useState({
-        prevWords: "",
-        currentWord: "",
-        wrongWord: "",
-        nextWord:"",
-    });
-    const initialWordsTyped = new Array(TIME_SECONDS).fill(0);
-    const initialLinesSent = 0;
-    const initialLinesRemaining= 0;
+let remainingWords = 0;
+let input = "";
 
-    const [numWordsTyped, setNumWordsTyped] = useState(initialWordsTyped);
-    const [linesSent, setLinesSent] = useState(initialLinesSent);
-    const [linesRemaining, setLinesRemaining] = useState(initialLinesRemaining);
+let tempWords = "";
+let tempWordStreak = 0;
 
-    const start = () =>{
-        const time = new Date()
+let linesDisplayed = 3;
+let maxLinesDisplayed = 8;
+// everytime a line is sent, add the number of words from the "added" line to remainingWords, and change display so that it shows 4 lines
+// this goes onward until you hit 8 lines displayed at once, you lose 
+
+// This function generates 50 lines of random words of exactly length 60
+function getLines(numLines, maxLength){
+    let lines = new Array(numLines);
+    let lineWordCount =  new Array(numLines);
+    for (let i = 0; i < numLines; i++){
+        lines[i] = "";
+        lineWordCount[i] = 0;
     }
+    let index = 0;
+    while(index < numLines){
+        let newWord = randomWords();
+        let newTotalLength = lines[index].length + newWord.length + 1; // 1 is for the space
+        if (maxLength - newTotalLength == 0){
+            lines[index] += newWord + " ";
+            lineWordCount[index] ++;
+            index++;
+        }
+        else if ((maxLength - newTotalLength <= 3)){
+            continue;
+        }
+        else if (newTotalLength < maxLength){ 
+            lines[index] += newWord + " ";
+            lineWordCount[index] ++;
+        }
+        
+    }
+    return [lines, lineWordCount];
 
+}
+
+let lines = getLines(50, 60);
+let text = lines[0].join("");
+let lineWordCount = lines[1]; //arr of all the word counts
+let wordRequirement = 0;
+
+//add the word count for the first 3 lines to the remaining number of words 
+for (let i = 0; i < 3; i++){
+    remainingWords += lineWordCount[i];
+    wordRequirement += lineWordCount[i];
+}
+
+
+
+
+const TypeBox = () => {
+    const updateMyPresence = useUpdateMyPresence();
+    updateMyPresence({wordsLeft : remainingWords});
+    let wpm = 0;
+    const {
+        states: {
+          charsState,
+          length,
+          currIndex,
+          currChar,
+          correctChar,
+          errorChar,
+          phase,
+          startTime,
+          endTime
+        },
+        actions: { insertTyping, resetTyping, deleteTyping, setCurrIndex, getDuration, endTyping }
+      } = useTypingGame(text, {
+        skipCurrentWordOnSpace: false,
+        pauseOnError: true,
+        countErrors: 'everytime'
+      });
+
+    const handleKey = (key) => {
+    if(remainingWords > 0){
+        if (key === "Backspace") {
+            if (charsState[currIndex + 1] === CharStateType.Incorrect) {
+                if (currIndex === -1) {
+                    insertTyping(currChar);
+                    deleteTyping(false);
+                } else {
+                    charsState[currIndex + 1] = CharStateType.Incomplete;
+                    deleteTyping(false);
+                    insertTyping(currChar);
+                }
+            } else {
+                deleteTyping(false);
+            }
+            if (currChar === " ") {
+                remainingWords++;
+                updateMyPresence({wordsLeft : remainingWords});
+            }
+        } else if (key.length === 1) {
+            
+            if(charsState[currIndex+1] !== CharStateType.Incorrect){
+                input += key;
+                if (currChar === " ") {
+                    remainingWords--;
+                    updateMyPresence({wordsLeft : remainingWords});
+                }
+                //takes care of noting the winning streaks (10 words with no errors)
+    
+                tempWords +=key;
+                tempWordStreak = tempWords.split(" ").length -1;
+                if(tempWordStreak >= 10){
+                    remainingWords += 10; // TODO: change this to send to other people 
+                    tempWords = "";
+                    tempWordStreak = 0;
+                }
+            }
+            else{
+                tempWords = "";
+                tempWordStreak = 0;
+    
+            }
+            insertTyping(key);
+    
+            if(remainingWords <=0){
+                endTyping();
+            }
+        }
+        console.log(remainingWords);
+    }
+   
+    };
+
+    return(
+      <div className = "typing-box">
+        <div>
+            <p >Remaining Words: {remainingWords}</p>
+            <p >Streak: {tempWordStreak}</p>
+        </div>
+        <div
+            className="typing-test"
+            onKeyDown={(e) => {
+            handleKey(e.key);
+            e.preventDefault();
+            }}
+            tabIndex={0}
+        >
+            {text.split("").map((char, index) => {
+                // index / 60 -> what line you're on
+                // display line + 2 more lines
+                let currLineNum = Math.floor((currIndex+1) / 60);
+                let lineNum = Math.floor((index) / 60);
+
+                if (lineNum >= currLineNum && lineNum <= currLineNum + 2) {
+                    let state = charsState[index];
+                    let color = state === 0 ? "black" : state === 1 ? "green" : "red";
+                    return (
+                        <span
+                        key={char + index}
+                        style={{ color }}
+                        className={currIndex + 1 === index ? "curr-letter" : ""}
+                        >
+                        {char}
+                        </span>
+                    );
+                }
+            })}
+        </div>
+        <div>
+            <p>WPM: {Math.round(60000/getDuration()*(correctChar/5))}</p>
+            <p >Accuracy: {correctChar/(errorChar+correctChar)*100}</p>
+        </div>
+            
+        {/* <pre>
+            {JSON.stringify(
+            {
+                startTime,
+                endTime,
+                length,
+                currIndex,
+                currChar,
+                correctChar,
+                errorChar,
+                phase,
+                wpm
+            },
+            null,
+            2
+            )}
+        </pre> */}
+    </div>
+    )
 
 
 }
 
+export default TypeBox;
+   

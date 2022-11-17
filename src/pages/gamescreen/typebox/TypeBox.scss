@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+.typing-box{
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.typing-test {
+  margin: auto;
+  width: 610px;
+  font-size: 1em;
+  outline: none;
+  text-align: center;
+  overflow: auto;
+}
+
+.curr-letter {
+  text-decoration: underline;
+}
+
