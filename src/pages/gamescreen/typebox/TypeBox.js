@@ -12,8 +12,6 @@ let input = "";
 let tempWords = "";
 let tempWordStreak = 0;
 
-let linesDisplayed = 3;
-let maxLinesDisplayed = 8;
 // everytime a line is sent, add the number of words from the "added" line to remainingWords, and change display so that it shows 4 lines
 // this goes onward until you hit 8 lines displayed at once, you lose 
 
@@ -58,10 +56,9 @@ for (let i = 0; i < 3; i++){
     wordRequirement += lineWordCount[i];
 }
 
-
-
-
-const TypeBox = () => {
+const TypeBox = (input_data) => {
+    const nickname = input_data.nickname;
+    
     const updateMyPresence = useUpdateMyPresence();
     updateMyPresence({wordsLeft : remainingWords});
     let wpm = 0;
@@ -115,7 +112,7 @@ const TypeBox = () => {
     
                 tempWords +=key;
                 tempWordStreak = tempWords.split(" ").length -1;
-                if(tempWordStreak >= 10){
+                if (tempWordStreak >= 10){
                     remainingWords += 10; // TODO: change this to send to other people 
                     tempWords = "";
                     tempWordStreak = 0;
@@ -139,7 +136,7 @@ const TypeBox = () => {
 
     return(
       <div className = "typing-box">
-        <div>
+        <div className="stats">
             <p >Remaining Words: {remainingWords}</p>
             <p >Streak: {tempWordStreak}</p>
         </div>
@@ -157,9 +154,9 @@ const TypeBox = () => {
                 let currLineNum = Math.floor((currIndex+1) / 60);
                 let lineNum = Math.floor((index) / 60);
 
-                if (lineNum >= currLineNum && lineNum <= currLineNum + 2) {
+                if (lineNum >= currLineNum && lineNum <= currLineNum + 4) {
                     let state = charsState[index];
-                    let color = state === 0 ? "black" : state === 1 ? "green" : "red";
+                    let color = state === 0 ? "#6D7D8A" : state === 1 ? "#E2F2F5" : "#E32B2B";
                     return (
                         <span
                         key={char + index}
@@ -172,28 +169,15 @@ const TypeBox = () => {
                 }
             })}
         </div>
-        <div>
-            <p>WPM: {Math.round(60000/getDuration()*(correctChar/5))}</p>
-            <p >Accuracy: {correctChar/(errorChar+correctChar)*100}</p>
+        <div className="sub-text">
+            <div className="stats">
+                <p>WPM: {Math.round(60000/getDuration()*(correctChar/5))}</p>
+                <p >Accuracy: {correctChar/(errorChar+correctChar)*100}%</p>
+            </div>
+            <div>
+                <p>player: { nickname }</p>
+            </div>
         </div>
-            
-        {/* <pre>
-            {JSON.stringify(
-            {
-                startTime,
-                endTime,
-                length,
-                currIndex,
-                currChar,
-                correctChar,
-                errorChar,
-                phase,
-                wpm
-            },
-            null,
-            2
-            )}
-        </pre> */}
     </div>
     )
 

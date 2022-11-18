@@ -8,7 +8,6 @@ function OthersUpdateGame() {
     // If a cursor is on screen (not null), render
     return (
       <div>
-        <h1>BRUHH</h1>
         {others.map(({ presence }) =>{
           return (
             <div>

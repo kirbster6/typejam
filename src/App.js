@@ -5,7 +5,6 @@ import './App.css';
 import HomePage from './pages/homepage/HomePage';
 import GameScreen from './pages/gamescreen/GameScreen';
 import { ChakraProvider } from '@chakra-ui/react';
-import TypeBox from "./pages/gamescreen/typebox/TypeBox";
 
 
 function App() {
