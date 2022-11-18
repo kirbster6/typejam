@@ -25,9 +25,9 @@ const HomePage = () => {
         </div>
         
         <form className="nickname-form">
-            <Input type="text" value={nickname} onChange={(ev) => setNickname(ev.target.value)} placeholder="enter a nickname." />
+            <Input id="nickname-input" type="text" value={nickname} onChange={(ev) => setNickname(ev.target.value)} placeholder="enter a nickname." />
             <Link to="/play" state={{nickname: nickname}}>
-              <Button colorScheme='teal'>join</Button>
+              <Button id="join-button" colorScheme='teal'>join</Button>
             </Link>
         </form>
     </div>
