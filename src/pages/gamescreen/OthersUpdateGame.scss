@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600&display=swap');
+
+.other {
+    font-family: 'Barlow', sans-serif;
+    color: #FFA3A3;
+    font-style: normal;
+    font-weight: 500;
+
+    .others-stats {
+        font-family: 'Barlow', sans-serif;
+        font-size: 18px;
+    }
+
+    .others-words {
+        font-family: 'Courier New', Courier, monospace, sans-serif;
+        margin: auto;
+        width: 620px;
+        font-size: 1em;
+        outline: none;
+        text-align: center;
+        overflow: auto;
+        background-color: black;
+        border-radius: 10px;
+        padding: 20px;
+        color: white;
+        border-style: solid;
+        border-color: #FFA3A3;
+        border-width: thick;
+    }
+}

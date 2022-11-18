@@ -6,7 +6,7 @@ import OthersUpdateGame from "./OthersUpdateGame";
 function GameRender({curr_user_nickname}) {
   const updateMyPresence = useUpdateMyPresence();
   const others = useOthers();
-  updateMyPresence({nickname : curr_user_nickname});
+  updateMyPresence({nickname : curr_user_nickname, isDone: false});
 
   return (
     <div>

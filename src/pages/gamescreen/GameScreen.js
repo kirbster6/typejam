@@ -13,7 +13,6 @@ const GameScreen = () => {
     const location = useLocation();
     const nickname = location.state?.nickname;
     
-    
     return (
         <div>
             <RoomProvider id="my-room-id" initialPresence={{}}>

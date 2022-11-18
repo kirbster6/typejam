@@ -1,6 +1,8 @@
 import { useOthers, useSelf} from "../../liveblocks.config";
 import TypeBox from "./typebox/TypeBox";
 
+import './OthersUpdateGame.scss';
+
 function OthersUpdateGame() {
     // List of other users
     const others = useOthers();
@@ -10,32 +12,22 @@ function OthersUpdateGame() {
       <div>
         {others.map(({ presence }) =>{
           return (
-            <div>
-              <p>Other User: {presence.nickname}</p>
-              <p>Other User Words Left: {presence.wordsLeft}</p>
+            <div className="other">
+              {presence.isDone && <div>ur a loser</div>}
+              <div>
+                <div className="others-stats">
+                  <p>Other User: {presence.nickname}</p>
+                  <p>Other User Words Left: {presence.wordsLeft}</p>
+                </div>
+                <div className="others-words">
+                  <p>{presence.linesShown}</p>
+                </div>
+              </div>
             </div>
-          ) 
+          ) ;
         })}
-
       </div>
     );
   }
-  
-  // Basic cursor component
-  function Cursor({ x, y }) {
-    // console.log("wait")
-    return (
-        <div>
-            <p>Maybe Working/</p>
-            <img
-                style={{
-                position: "absolute",
-                transform: `translate(${x}px, ${y}px)`,
-                }}
-                src="public\logo512.png"
-            />
-        </div>
-        
-    );
-  }
+
 export default OthersUpdateGame;

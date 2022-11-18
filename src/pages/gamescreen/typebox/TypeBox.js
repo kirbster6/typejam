@@ -56,9 +56,25 @@ for (let i = 0; i < 3; i++){
     wordRequirement += lineWordCount[i];
 }
 
+function updatePresenceCurrentText(currIndex) {
+    let currentLines = "";
+    text.split("").map((char, index) => {
+        // index / 60 -> what line you're on
+        // display line + 2 more lines
+        let currLineNum = Math.floor((currIndex+1) / 60);
+        let lineNum = Math.floor((index) / 60);
+
+        if (lineNum >= currLineNum && lineNum <= currLineNum + 4) {
+            currentLines += char;
+        }
+    });
+
+    return currentLines;
+}
+
 const TypeBox = (input_data) => {
     const nickname = input_data.nickname;
-    
+
     const updateMyPresence = useUpdateMyPresence();
     updateMyPresence({wordsLeft : remainingWords});
     let wpm = 0;
@@ -80,58 +96,69 @@ const TypeBox = (input_data) => {
         pauseOnError: true,
         countErrors: 'everytime'
       });
-
+    
+    /*const others = useOthers();
+    others.map(({ presence }) =>{
+        if (presence.isDone == true) {
+            endTyping();
+        }
+    });*/
+    
+    let currentLines = updatePresenceCurrentText(currIndex);
+    updateMyPresence({linesShown: currentLines});
     const handleKey = (key) => {
-    if(remainingWords > 0){
-        if (key === "Backspace") {
-            if (charsState[currIndex + 1] === CharStateType.Incorrect) {
-                if (currIndex === -1) {
-                    insertTyping(currChar);
-                    deleteTyping(false);
+        if (remainingWords > 0){
+            if (key === "Backspace") {
+                if (charsState[currIndex + 1] === CharStateType.Incorrect) {
+                    if (currIndex === -1) {
+                        insertTyping(currChar);
+                        deleteTyping(false);
+                    } else {
+                        charsState[currIndex + 1] = CharStateType.Incomplete;
+                        deleteTyping(false);
+                        insertTyping(currChar);
+                    }
                 } else {
-                    charsState[currIndex + 1] = CharStateType.Incomplete;
                     deleteTyping(false);
-                    insertTyping(currChar);
                 }
-            } else {
-                deleteTyping(false);
-            }
-            if (currChar === " ") {
-                remainingWords++;
-                updateMyPresence({wordsLeft : remainingWords});
-            }
-        } else if (key.length === 1) {
-            
-            if(charsState[currIndex+1] !== CharStateType.Incorrect){
-                input += key;
                 if (currChar === " ") {
-                    remainingWords--;
+                    remainingWords++;
                     updateMyPresence({wordsLeft : remainingWords});
                 }
-                //takes care of noting the winning streaks (10 words with no errors)
-    
-                tempWords +=key;
-                tempWordStreak = tempWords.split(" ").length -1;
-                if (tempWordStreak >= 10){
-                    remainingWords += 10; // TODO: change this to send to other people 
+            } else if (key.length === 1) {
+                
+                if(charsState[currIndex+1] !== CharStateType.Incorrect){
+                    input += key;
+                    if (currChar === " ") {
+                        remainingWords--;
+                        updateMyPresence({wordsLeft : remainingWords});
+                    }
+                    //takes care of noting the winning streaks (10 words with no errors)
+        
+                    tempWords +=key;
+                    tempWordStreak = tempWords.split(" ").length -1;
+                    if (tempWordStreak >= 10){
+                        /*remainingWords += 10; // TODO: change this to send to other people 
+                        tempWords = "";
+                        tempWordStreak = 0;*/
+                    }
+                }
+                else{
                     tempWords = "";
                     tempWordStreak = 0;
+        
+                }
+                insertTyping(key);
+        
+                if(remainingWords <= 0){
+                    endTyping();
+                    updateMyPresence({isDone: true});
+                    //show winning screen
                 }
             }
-            else{
-                tempWords = "";
-                tempWordStreak = 0;
-    
-            }
-            insertTyping(key);
-    
-            if(remainingWords <=0){
-                endTyping();
-            }
+            let currentLines = updatePresenceCurrentText(currIndex);
+            updateMyPresence({linesShown: currentLines});
         }
-        console.log(remainingWords);
-    }
-   
     };
 
     return(
@@ -172,7 +199,7 @@ const TypeBox = (input_data) => {
         <div className="sub-text">
             <div className="stats">
                 <p>WPM: {Math.round(60000/getDuration()*(correctChar/5))}</p>
-                <p >Accuracy: {correctChar/(errorChar+correctChar)*100}%</p>
+                <p>Accuracy: {Math.round(correctChar/(errorChar+correctChar)*100)}%</p>
             </div>
             <div>
                 <p>player: { nickname }</p>
