@@ -2,6 +2,7 @@ import { useUpdateMyPresence, useOthers } from "../../liveblocks.config";
 import SelfUpdateGame from "./SelfUpdateGame";
 import OthersUpdateGame from "./OthersUpdateGame";
 
+import './GameRender.scss';
 
 function GameRender({curr_user_nickname}) {
   const updateMyPresence = useUpdateMyPresence();
@@ -9,16 +10,9 @@ function GameRender({curr_user_nickname}) {
   updateMyPresence({nickname : curr_user_nickname, isDone: false});
 
   return (
-    <div>
-      <h1>Rendering Players</h1>
-      <h4>Waiting Room:</h4>
-      {others.map(({ presence }) =>{
-          return (
-            <p>{presence.nickname}</p>
-          ) 
-      })}
-      <SelfUpdateGame />
-      <OthersUpdateGame />
+    <div className="game-screen">
+      <SelfUpdateGame className="self-game"/>
+      <OthersUpdateGame className="other-game"/>
     </div>
   );
 }

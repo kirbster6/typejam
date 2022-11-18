@@ -7,16 +7,18 @@
     font-style: normal;
     font-weight: 500;
 
+    padding-bottom: 30px;
+
     .others-stats {
         font-family: 'Barlow', sans-serif;
-        font-size: 18px;
+        font-size: 14px;
     }
 
     .others-words {
         font-family: 'Courier New', Courier, monospace, sans-serif;
         margin: auto;
-        width: 620px;
-        font-size: 1em;
+        width: 560px;
+        font-size: 14px;
         outline: none;
         text-align: center;
         overflow: auto;

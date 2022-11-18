@@ -6,8 +6,6 @@ function SelfUpdateGame() {
 
   return (
     <div>
-      
-      <p>My User Nickname: {myPresence.nickname}</p>
       <div className="SelfGame">
         {myPresence.isDone && <div>u a winner</div>}
         <TypeBox nickname={myPresence.nickname} ></TypeBox>
