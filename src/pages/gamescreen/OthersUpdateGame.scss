@@ -15,7 +15,8 @@
     }
 
     .others-words {
-        font-family: 'Courier New', Courier, monospace, sans-serif;
+        font-family: 'Courier New', Courier, mo
+        nospace, sans-serif;
         margin: auto;
         width: 560px;
         font-size: 14px;
@@ -25,9 +26,50 @@
         background-color: black;
         border-radius: 10px;
         padding: 20px;
-        color: white;
+        color: #6D7D8A;
         border-style: solid;
         border-color: #FFA3A3;
         border-width: thick;
+        opacity : 0.5;
     }
 }
+
+.modal-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+  }
+  
+  .stats-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 5px;
+    background: rgb(128, 128, 128, 0.2);
+    margin-left: 1.5em;
+    margin-right: 1.5em;
+    
+  }
+  
+  .stats {
+    display: flex;
+    justify-content: center;
+    align-items: left;
+    flex-direction: column;
+    color: black;
+   
+    // font-family: ;
+  }
+  
+  .stats-box{
+    .stats{
+      padding-top:1em;
+      padding-bottom:1em;
+      align-items:center;
+
+    }
+  
+  }
+  

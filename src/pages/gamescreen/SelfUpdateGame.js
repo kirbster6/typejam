@@ -8,14 +8,17 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure
+  useDisclosure,
+  Center,
 } from '@chakra-ui/react';
 import TypeBox from "./typebox/TypeBox";
+import './SelfUpdateGame.scss';
 
 function SelfUpdateGame() {
   const updateMyPresence = useUpdateMyPresence();
   const myPresence = useSelf((me) => me.presence);
   const { onClose } = useDisclosure();
+
 
   function refreshPage() {
     window.location.assign('http://localhost:3000/');
@@ -24,23 +27,27 @@ function SelfUpdateGame() {
 
   return (
     <div>
-      <div className="SelfGame">
+      <div className="SelfGame" >
         {myPresence.isDone && 
-          <Modal isOpen={myPresence.isDone} onClose={onClose}>
+          <Modal isOpen={myPresence.isDone} onClose={onClose} classid="modal">
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>WINNER</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <div>pp poo poo</div>
+              <ModalHeader className='modal-header'>CONGRATS, you won!</ModalHeader>
+              <ModalBody className='stats-box'>
+                <div className='stats'>
+                    <p>WPM:  {myPresence.wpm}</p>
+                    <p>Accuracy:  {myPresence.accuracy}%</p>
+                    <p># of Lines Sent:  {myPresence.linesSent}</p>
+                  </div>
               </ModalBody>
-    
-              <ModalFooter>
-                <Button colorScheme='teal' mr={3} onClick={refreshPage}>
-                  Play Again
-                </Button>
-              </ModalFooter>
-            </ModalContent>
+              <Center>
+                <ModalFooter>
+                    <Button colorScheme='teal'   onClick={refreshPage} >
+                      Play Again
+                    </Button>
+                </ModalFooter>
+                </Center> 
+              </ModalContent>
           </Modal>
         }
         <TypeBox nickname={myPresence.nickname} ></TypeBox>

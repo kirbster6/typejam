@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useRef} from 'react';
+import React from 'react';
 import './TypeBox.scss';
 import {useSelf, useUpdateMyPresence, useBroadcastEvent, useEventListener} from '../../../liveblocks.config.js';
 
@@ -7,13 +7,16 @@ import useTypingGame , { CharStateType } from 'react-typing-game-hook';
 const randomWords = require('random-words');
 
 var remainingWords = 0;
-let input = "";
+
 
 let tempWords = "";
 let tempWordStreak = 0;
 
-// everytime a line is sent, add the number of words from the "added" line to remainingWords, and change display so that it shows 4 lines
-// this goes onward until you hit 8 lines displayed at once, you lose 
+let wordStreak = 0;
+
+
+let numLinesSent = 0;
+
 
 // This function generates 50 lines of random words of exactly length 60
 function getLines(numLines, maxLength){
@@ -27,7 +30,7 @@ function getLines(numLines, maxLength){
     while(index < numLines){
         let newWord = randomWords();
         let newTotalLength = lines[index].length + newWord.length + 1; // 1 is for the space
-        if (maxLength - newTotalLength == 0){
+        if (maxLength - newTotalLength === 0){
             lines[index] += newWord + " ";
             lineWordCount[index] ++;
             index++;
@@ -48,12 +51,12 @@ function getLines(numLines, maxLength){
 let lines = getLines(50, 60);
 let text = lines[0].join("");
 let lineWordCount = lines[1]; //arr of all the word counts
-let wordRequirement = 0;
+// let wordRequirement = 0;
 
 //add the word count for the first 3 lines to the remaining number of words 
 for (let i = 0; i < 3; i++){
     remainingWords += lineWordCount[i];
-    wordRequirement += lineWordCount[i];
+    // wordRequirement += lineWordCount[i];
 }
 
 function updatePresenceCurrentText(currIndex) {
@@ -67,12 +70,14 @@ function updatePresenceCurrentText(currIndex) {
         if (lineNum >= currLineNum && lineNum <= currLineNum + 4) {
             currentLines += char;
         }
+        return null;
     });
 
     return currentLines;
 }
 
 const TypeBox = (input_data) => {
+    // let input = "";
     const nickname = input_data.nickname;
     let myPresence = useSelf((me) => me.presence);
 
@@ -80,20 +85,20 @@ const TypeBox = (input_data) => {
     const updateMyPresence = useUpdateMyPresence();
     updateMyPresence({wordsLeft : remainingWords});
 
-    let wpm = 0;
+    // let wpm = 0;
     const {
         states: {
           charsState,
-          length,
+        //   length,
           currIndex,
           currChar,
           correctChar,
           errorChar,
-          phase,
-          startTime,
-          endTime
+        //   phase,
+        //   startTime,
+        //   endTime
         },
-        actions: { insertTyping, resetTyping, deleteTyping, setCurrIndex, getDuration, endTyping }
+        actions: { insertTyping, deleteTyping,  getDuration, endTyping } //, resetTyping, setCurrIndex,
       } = useTypingGame(text, {
         skipCurrentWordOnSpace: false,
         pauseOnError: true,
@@ -105,6 +110,10 @@ const TypeBox = (input_data) => {
             let prevWordsLeft = myPresence.wordsLeft;
             updateMyPresence({wordsLeft : prevWordsLeft + event.numSent});
             remainingWords = prevWordsLeft + event.numSent;
+        } else if (event.type === "GAMEDONE") {
+            let endwpm = Math.round(60000/getDuration()*(correctChar/5));
+            let endaccuracy = Math.round(correctChar/(errorChar+correctChar)*100);
+            updateMyPresence({ wpm : endwpm , accuracy : endaccuracy, linesSent : numLinesSent});
         }
     });
 
@@ -128,32 +137,60 @@ const TypeBox = (input_data) => {
                 }
                 if (currChar === " ") {
                     remainingWords++;
+                    tempWordStreak--;
+                    if(wordStreak > 0){
+                        wordStreak--;
+                    }
                     updateMyPresence({wordsLeft : remainingWords});
                 }
             } else if (key.length === 1) {
                 
                 if(charsState[currIndex+1] !== CharStateType.Incorrect){
-                    input += key;
+                    // input += key;
+                    tempWords += key;
+                    // tempWordStreak = tempWords.split(" ").length -1;
+
                     if (currChar === " ") {
                         remainingWords--;
                         updateMyPresence({wordsLeft : remainingWords});
+                        tempWordStreak++;
+                        wordStreak++;
+
+                        if (tempWordStreak >= 10){
+                            numLinesSent++;
+                            tempWordStreak ="";
+                            tempWordStreak = 0;
+                            
+                            broadcast({ type: "ADDWORDS", numSent: 5 });
+                        }
+                        //Update streak here
                     }
                     // takes care of noting the winning streaks (10 words with no errors)
         
-                    tempWords += key;
-                    tempWordStreak = tempWords.split(" ").length -1;
-                    if (tempWordStreak != 0 && tempWordStreak%10 == 0){
-                        broadcast({ type: "ADDWORDS", numSent: 10 });
-                    }
+                    // tempWords += key;
+                    // tempWordStreak = tempWords.split(" ").length -1;
+
+
+                    // if (tempWordStreak >= 10){
+                    //     numLinesSent++;
+                    //     tempWordStreak ="";
+                    //     tempWordStreak = 0;
+                    //     broadcast({ type: "ADDWORDS", numSent: 10 });
+                    // }
                 }
                 else{
                     tempWords = "";
                     tempWordStreak = 0;
-        
+                    wordStreak = 0;
+
                 }
                 insertTyping(key);
         
                 if(remainingWords <= 0){
+                    let endwpm = Math.round(60000/getDuration()*(correctChar/5));
+                    let endaccuracy = Math.round(correctChar/(errorChar+correctChar)*100);
+                    updateMyPresence({ wpm : endwpm , accuracy : endaccuracy, linesSent : numLinesSent});
+                    broadcast({ type: "GAMEDONE" });
                     endTyping();
                     updateMyPresence({isDone: true});
                 }
@@ -167,7 +204,7 @@ const TypeBox = (input_data) => {
       <div className = "typing-box">
         <div className="stats">
             <p >words remaining: {remainingWords}</p>
-            <p >streak: {tempWordStreak}</p>
+            <p >streak: {wordStreak}</p>
         </div>
         <div
             className="typing-test"
@@ -196,6 +233,7 @@ const TypeBox = (input_data) => {
                         </span>
                     );
                 }
+                return null;
             })}
         </div>
         <div className="sub-text">

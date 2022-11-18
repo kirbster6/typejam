@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import './GameScreen.scss';
 
 import { ClientSideSuspense } from "@liveblocks/react";
-import { RoomProvider, useOthers, useUpdateMyPresence } from "../../liveblocks.config.js";
+import { RoomProvider } from "../../liveblocks.config.js";
 import GameRender from './GameRender';
 
 

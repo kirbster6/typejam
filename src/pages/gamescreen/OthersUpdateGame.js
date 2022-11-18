@@ -1,4 +1,4 @@
-import { useOthers } from "../../liveblocks.config";
+import { useOthers, useSelf } from "../../liveblocks.config";
 import {
   Button,
   Modal,
@@ -8,7 +8,8 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure
+  useDisclosure,
+  Center
 } from '@chakra-ui/react';
 import './OthersUpdateGame.scss';
 
@@ -16,6 +17,7 @@ function OthersUpdateGame() {
     // List of other users
     const others = useOthers();
     const { onClose } = useDisclosure();
+    let myPresence = useSelf((me) => me.presence);
 
     function refreshPage() {
       window.location.assign('http://localhost:3000/');
@@ -31,17 +33,21 @@ function OthersUpdateGame() {
                 <Modal isOpen={presence.isDone} onClose={onClose}>
                   <ModalOverlay />
                   <ModalContent>
-                    <ModalHeader>LOSER</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                      <div>pp poo poo</div>
+                    <ModalHeader className='modal-header'>Better luck next time!</ModalHeader>
+                    <ModalBody className='stats-box'>
+                      <div className='stats'>
+                        <p>WPM: {myPresence.wpm}</p>
+                        <p>Accuracy: {myPresence.accuracy}%</p>
+                        <p># of Lines Sent: {myPresence.linesSent}</p>
+                      </div>
                     </ModalBody>
-          
-                    <ModalFooter>
-                      <Button colorScheme='teal' mr={3} onClick={refreshPage}>
-                        Play Again
-                      </Button>
-                    </ModalFooter>
+                    <Center>
+                      <ModalFooter>
+                        <Button colorScheme='teal' mr={3} onClick={refreshPage}>
+                          Play Again
+                        </Button>
+                      </ModalFooter>
+                    </Center>
                   </ModalContent>
                 </Modal>
               }
