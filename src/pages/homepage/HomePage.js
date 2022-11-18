@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import typejam from '../../assets/typejam.png'; 
 
 
@@ -10,10 +10,8 @@ import { Button } from '@chakra-ui/react';
 import { Input } from '@chakra-ui/react';
 import { Image } from '@chakra-ui/react';
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faKeyboard } from "@fortawesome/free-solid-svg-icons";
-
 const HomePage = () => {
+  const navigate = useNavigate();
   const [nickname, setNickname] = useState("");
   console.log(nickname);
 
@@ -25,7 +23,14 @@ const HomePage = () => {
         </div>
         
         <form className="nickname-form">
-            <Input id="nickname-input" type="text" value={nickname} onChange={(ev) => setNickname(ev.target.value)} placeholder="enter a nickname." />
+            <Input id="nickname-input" type="text" value={nickname} 
+              onChange={(ev) => setNickname(ev.target.value)} 
+              onKeyPress={e=> {
+                if (e.key === 'Enter') {
+                  navigate(`/play`, {state: {nickname: nickname}});
+                }
+              }}
+              placeholder="enter a nickname." />
             <Link to="/play" state={{nickname: nickname}}>
               <Button id="join-button" colorScheme='teal'>join</Button>
             </Link>

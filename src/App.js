@@ -99,7 +99,7 @@ const particlesLoaded = useCallback(async container => {
                         value: 20,
                     },
                     opacity: {
-                        value: 0.25,
+                        value: 0.50,
                     },
                     shape: {
                         type: "circle",

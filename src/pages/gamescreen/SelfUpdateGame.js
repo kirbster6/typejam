@@ -7,18 +7,17 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton,
   useDisclosure,
   Center,
 } from '@chakra-ui/react';
 import TypeBox from "./typebox/TypeBox";
 import './SelfUpdateGame.scss';
+import Confetti from './Confetti.js'
 
 function SelfUpdateGame() {
   const updateMyPresence = useUpdateMyPresence();
   const myPresence = useSelf((me) => me.presence);
   const { onClose } = useDisclosure();
-
 
   function refreshPage() {
     window.location.assign('http://localhost:3000/');
@@ -29,10 +28,12 @@ function SelfUpdateGame() {
     <div>
       <div className="SelfGame" >
         {myPresence.isDone && 
+          <>
           <Modal isOpen={myPresence.isDone} onClose={onClose} classid="modal">
             <ModalOverlay />
             <ModalContent>
               <ModalHeader className='modal-header'>CONGRATS, you won!</ModalHeader>
+              
               <ModalBody className='stats-box'>
                 <div className='stats'>
                     <p>WPM:  {myPresence.wpm}</p>
@@ -42,13 +43,15 @@ function SelfUpdateGame() {
               </ModalBody>
               <Center>
                 <ModalFooter>
-                    <Button colorScheme='teal'   onClick={refreshPage} >
+                    <Button colorScheme='teal' onClick={refreshPage} >
                       Play Again
                     </Button>
                 </ModalFooter>
                 </Center> 
               </ModalContent>
           </Modal>
+          <Confetti />
+          </>
         }
         <TypeBox nickname={myPresence.nickname} ></TypeBox>
       </div>

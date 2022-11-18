@@ -165,18 +165,6 @@ const TypeBox = (input_data) => {
                         }
                         //Update streak here
                     }
-                    // takes care of noting the winning streaks (10 words with no errors)
-        
-                    // tempWords += key;
-                    // tempWordStreak = tempWords.split(" ").length -1;
-
-
-                    // if (tempWordStreak >= 10){
-                    //     numLinesSent++;
-                    //     tempWordStreak ="";
-                    //     tempWordStreak = 0;
-                    //     broadcast({ type: "ADDWORDS", numSent: 10 });
-                    // }
                 }
                 else{
                     tempWords = "";

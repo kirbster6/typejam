@@ -7,7 +7,6 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton,
   useDisclosure,
   Center
 } from '@chakra-ui/react';
@@ -19,8 +18,17 @@ function OthersUpdateGame() {
     const { onClose } = useDisclosure();
     let myPresence = useSelf((me) => me.presence);
 
-    function refreshPage() {
+    function refreshPage(e) {
+      //check if space
+      console.log(e);
       window.location.assign('http://localhost:3000/');
+    }
+
+    function handleKeyChange(event){
+      if(event.keyCode == 32){
+        event.preventDefault();
+        alert('space');
+      }
     }
 
     // If a cursor is on screen (not null), render
@@ -43,7 +51,7 @@ function OthersUpdateGame() {
                     </ModalBody>
                     <Center>
                       <ModalFooter>
-                        <Button colorScheme='teal' mr={3} onClick={refreshPage}>
+                        <Button colorScheme='teal' mr={3} onClick={refreshPage} onKeyPress={handleKeyChange}>
                           Play Again
                         </Button>
                       </ModalFooter>
