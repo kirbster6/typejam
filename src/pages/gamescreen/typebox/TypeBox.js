@@ -1,12 +1,12 @@
 import React, {useState, useMemo, useRef} from 'react';
 import './TypeBox.scss';
-import {useSelf, useOthers, useUpdateMyPresence} from '../../../liveblocks.config.js';
+import {useSelf, useUpdateMyPresence, useBroadcastEvent, useEventListener} from '../../../liveblocks.config.js';
 
 import useTypingGame , { CharStateType } from 'react-typing-game-hook';
 
 const randomWords = require('random-words');
 
-let remainingWords = 0;
+var remainingWords = 0;
 let input = "";
 
 let tempWords = "";
@@ -74,9 +74,12 @@ function updatePresenceCurrentText(currIndex) {
 
 const TypeBox = (input_data) => {
     const nickname = input_data.nickname;
+    let myPresence = useSelf((me) => me.presence);
 
+    const broadcast = useBroadcastEvent();
     const updateMyPresence = useUpdateMyPresence();
     updateMyPresence({wordsLeft : remainingWords});
+
     let wpm = 0;
     const {
         states: {
@@ -97,15 +100,17 @@ const TypeBox = (input_data) => {
         countErrors: 'everytime'
       });
     
-    /*const others = useOthers();
-    others.map(({ presence }) =>{
-        if (presence.isDone == true) {
-            endTyping();
+    useEventListener(({ event }) => {
+        if (event.type === "ADDWORDS") {
+            let prevWordsLeft = myPresence.wordsLeft;
+            updateMyPresence({wordsLeft : prevWordsLeft + event.numSent});
+            remainingWords = prevWordsLeft + event.numSent;
         }
-    });*/
-    
+    });
+
     let currentLines = updatePresenceCurrentText(currIndex);
     updateMyPresence({linesShown: currentLines});
+
     const handleKey = (key) => {
         if (remainingWords > 0){
             if (key === "Backspace") {
@@ -133,14 +138,12 @@ const TypeBox = (input_data) => {
                         remainingWords--;
                         updateMyPresence({wordsLeft : remainingWords});
                     }
-                    //takes care of noting the winning streaks (10 words with no errors)
+                    // takes care of noting the winning streaks (10 words with no errors)
         
-                    tempWords +=key;
+                    tempWords += key;
                     tempWordStreak = tempWords.split(" ").length -1;
-                    if (tempWordStreak >= 10){
-                        /*remainingWords += 10; // TODO: change this to send to other people 
-                        tempWords = "";
-                        tempWordStreak = 0;*/
+                    if (tempWordStreak != 0 && tempWordStreak%10 == 0){
+                        broadcast({ type: "ADDWORDS", numSent: 10 });
                     }
                 }
                 else{
@@ -153,7 +156,6 @@ const TypeBox = (input_data) => {
                 if(remainingWords <= 0){
                     endTyping();
                     updateMyPresence({isDone: true});
-                    //show winning screen
                 }
             }
             let currentLines = updatePresenceCurrentText(currIndex);
@@ -164,8 +166,8 @@ const TypeBox = (input_data) => {
     return(
       <div className = "typing-box">
         <div className="stats">
-            <p >Remaining Words: {remainingWords}</p>
-            <p >Streak: {tempWordStreak}</p>
+            <p >words remaining: {remainingWords}</p>
+            <p >streak: {tempWordStreak}</p>
         </div>
         <div
             className="typing-test"
@@ -198,8 +200,8 @@ const TypeBox = (input_data) => {
         </div>
         <div className="sub-text">
             <div className="stats">
-                <p>WPM: {Math.round(60000/getDuration()*(correctChar/5))}</p>
-                <p>Accuracy: {Math.round(correctChar/(errorChar+correctChar)*100)}%</p>
+                <p>wpm: {Math.round(60000/getDuration()*(correctChar/5))}</p>
+                <p>accuracy: {Math.round(correctChar/(errorChar+correctChar)*100)}%</p>
             </div>
             <div>
                 <p>player: { nickname }</p>

@@ -1,12 +1,12 @@
-import { useUpdateMyPresence, useOthers } from "../../liveblocks.config";
+import { useUpdateMyPresence } from "../../liveblocks.config";
 import SelfUpdateGame from "./SelfUpdateGame";
 import OthersUpdateGame from "./OthersUpdateGame";
+
 
 import './GameRender.scss';
 
 function GameRender({curr_user_nickname}) {
   const updateMyPresence = useUpdateMyPresence();
-  const others = useOthers();
   updateMyPresence({nickname : curr_user_nickname, isDone: false});
 
   return (

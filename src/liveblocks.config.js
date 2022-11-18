@@ -11,5 +11,7 @@ export const {
         useOthers,
         useUpdateMyPresence,
         useSelf,
+        useBroadcastEvent,
+        useEventListener,
     }, 
 } = createRoomContext(client);
