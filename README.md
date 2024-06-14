@@ -13,3 +13,12 @@
 
 ## Technologies We Used:
 - React.js, HTML, SCSS/CSS, react-confetti, liveblocks api, particles.js
+
+## Future plans for the website
+- [ ] Make website mobile-responsive
+- [ ] Allow for multiple lobbies through a room code
+- [ ] Countdown after game start is initiated
+- [ ] Dark mode
+- [ ] Time limit for each game (optional)
+- [ ] Bug Fix: pressing play again in post-game popup makes other user's page refresh
+
